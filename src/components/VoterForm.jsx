@@ -1,13 +1,9 @@
-// src/components/VoterForm.jsx
 import React, { useState } from "react";
 
-const API_BASE = "https://new-backend-voting-app.vercel.app"; // your backend URL
+const API_BASE = "https://new-backend-voting-app.vercel.app";
 
 const VoterForm = ({ onVerified }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    voterId: "",
-  });
+  const [formData, setFormData] = useState({ name: "", voterId: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -32,12 +28,10 @@ const VoterForm = ({ onVerified }) => {
         throw new Error(`Verification failed: ${text}`);
       }
 
-      const data = await res.json(); // e.g., { token: "...", voterId: "123" }
+      const data = await res.json();
+      if (data.token) localStorage.setItem("token", data.token);
 
-      // Notify parent that verification succeeded
       onVerified(data);
-
-      // Reset form
       setFormData({ name: "", voterId: "" });
     } catch (err) {
       console.error(err);
@@ -53,9 +47,7 @@ const VoterForm = ({ onVerified }) => {
       className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6 mt-6"
     >
       <h2 className="text-2xl font-bold mb-4 text-blue-700">Voter Verification</h2>
-
       {error && <p className="text-red-600 mb-3">{error}</p>}
-
       <input
         type="text"
         name="name"
@@ -76,7 +68,6 @@ const VoterForm = ({ onVerified }) => {
         required
         disabled={loading}
       />
-
       <button
         type="submit"
         className={`w-full py-2 rounded ${

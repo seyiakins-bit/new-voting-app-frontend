@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const VoteButton = ({ candidate, onVote }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [votes, setVotes] = useState(candidate.votes || 0);
   const [voted, setVoted] = useState(false);
 
+  useEffect(() => {
+    setVotes(candidate.votes || 0); // keep votes synced with parent
+  }, [candidate.votes]);
+
   const handleConfirm = async () => {
     try {
-      const newVoteCount = await onVote(candidate); // parent returns updated vote count
+      const newVoteCount = await onVote(candidate); // parent returns updated votes
       setVotes(newVoteCount);
       setVoted(true);
     } catch (err) {
@@ -22,7 +26,9 @@ const VoteButton = ({ candidate, onVote }) => {
     <>
       <button
         className={`px-4 py-2 rounded-lg transition ${
-          voted ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
+          voted
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700 text-white"
         }`}
         onClick={() => setIsOpen(true)}
         disabled={voted}
@@ -32,7 +38,6 @@ const VoteButton = ({ candidate, onVote }) => {
 
       <p className="mt-2 text-gray-600">Votes: {votes}</p>
 
-      {/* Modal */}
       {isOpen && !voted && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">

@@ -1,20 +1,21 @@
-// src/pages/VotingPage.jsx
 import React, { useEffect, useState } from "react";
 import CandidateCard from "../components/CandidateCard";
 import VoterForm from "../components/VoterForm";
 
-const API_BASE = "https://new-backend-voting-app.vercel.app"; // your backend URL
+const API_BASE = "https://new-backend-voting-app.vercel.app";
 
-const VotingPage = ({ token }) => {
+const VotingPage = () => {
   const [verified, setVerified] = useState(false);
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch candidates from backend
   const fetchCandidates = async () => {
+    if (!token) return;
     setLoading(true);
     setError(null);
+
     try {
       const res = await fetch(`${API_BASE}/vote/candidates`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -22,7 +23,7 @@ const VotingPage = ({ token }) => {
 
       if (!res.ok) {
         const text = await res.text();
-        throw new Error(`Failed to fetch: ${res.status} - ${text}`);
+        throw new Error(`Failed to fetch candidates: ${res.status} - ${text}`);
       }
 
       const data = await res.json();
@@ -37,16 +38,20 @@ const VotingPage = ({ token }) => {
 
   useEffect(() => {
     if (verified) fetchCandidates();
-  }, [verified]);
+  }, [verified, token]);
 
-  // Handle voter verification
-  const handleVoterSubmit = (formData) => {
-    console.log("Voter verified:", formData);
+  const handleVoterVerified = (data) => {
+    setToken(data.token || "");
+    localStorage.setItem("token", data.token || "");
     setVerified(true);
   };
 
-  // Handle vote submission
   const handleVote = async (candidate) => {
+    if (!token) {
+      alert("No voter token found. Please verify first.");
+      return;
+    }
+
     try {
       const res = await fetch(`${API_BASE}/vote`, {
         method: "POST",
@@ -62,10 +67,14 @@ const VotingPage = ({ token }) => {
         throw new Error(`Failed to vote: ${text}`);
       }
 
+      const data = await res.json();
       alert(`You voted for ${candidate.name} (${candidate.party})`);
 
-      // Refresh candidate list (or just vote counts if available)
-      fetchCandidates();
+      setCandidates((prev) =>
+        prev.map((c) =>
+          c.id === candidate.id ? { ...c, votes: data.votes } : c
+        )
+      );
     } catch (err) {
       console.error(err);
       alert(err.message);
@@ -77,7 +86,7 @@ const VotingPage = ({ token }) => {
       <h2 className="text-2xl font-bold text-blue-700 mb-4">Cast Your Vote</h2>
 
       {!verified ? (
-        <VoterForm onSubmit={handleVoterSubmit} />
+        <VoterForm onVerified={handleVoterVerified} />
       ) : loading ? (
         <p className="text-gray-600">Loading candidates...</p>
       ) : error ? (

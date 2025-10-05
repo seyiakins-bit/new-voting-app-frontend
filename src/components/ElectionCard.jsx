@@ -1,34 +1,31 @@
-// src/components/ElectionCard.jsx
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // <-- IMPORTANT
+import { useNavigate } from "react-router-dom";
 import VoteButton from "./VoteButton";
 
-const API_BASE = "https://new-backend-voting-app.vercel.app"; // backend URL
+const API_BASE = "https://new-backend-voting-app.vercel.app";
 
-const ElectionCard = ({ election, token: propToken }) => {
-  const isActive = election.status === "active";
+const ElectionCard = ({ election, token }) => {
   const navigate = useNavigate();
-  const [candidates, setCandidates] = useState([]);
+  const [candidates, setCandidates] = useState(election.candidates || []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchCandidates = async () => {
-    setLoading(true);
-    setError(null);
+  const isActive = election.status === "active";
 
-    const token = propToken || localStorage.getItem("token");
+  const fetchCandidates = async () => {
     if (!token) {
       setError("No token found. Showing default candidates.");
       setLoading(false);
-      return; // fallback will use election.candidates
+      return;
     }
+
+    setLoading(true);
+    setError(null);
 
     try {
       const res = await fetch(
         `${API_BASE}/vote/candidates?electionId=${election.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (!res.ok) {
@@ -41,6 +38,7 @@ const ElectionCard = ({ election, token: propToken }) => {
     } catch (err) {
       console.error(err);
       setError("Could not fetch live candidates. Showing default candidates.");
+      setCandidates(election.candidates || []);
     } finally {
       setLoading(false);
     }
@@ -48,13 +46,12 @@ const ElectionCard = ({ election, token: propToken }) => {
 
   useEffect(() => {
     if (isActive) fetchCandidates();
-  }, [election.id]);
+  }, [election.id, token, isActive]);
 
   const handleVote = async (candidate) => {
-    const token = propToken || localStorage.getItem("token");
     if (!token) {
-      alert("No token found. Please login.");
-      return;
+      alert("No token found. Please verify first.");
+      throw new Error("No token");
     }
 
     try {
@@ -73,6 +70,7 @@ const ElectionCard = ({ election, token: propToken }) => {
       }
 
       const data = await res.json();
+
       setCandidates((prev) =>
         prev.map((c) =>
           c.id === candidate.id ? { ...c, votes: data.votes } : c
@@ -86,9 +84,6 @@ const ElectionCard = ({ election, token: propToken }) => {
       throw err;
     }
   };
-
-  const displayedCandidates =
-    candidates.length > 0 ? candidates : election.candidates || [];
 
   return (
     <div className="border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition bg-white overflow-hidden">
@@ -131,12 +126,11 @@ const ElectionCard = ({ election, token: propToken }) => {
           <p className="mt-3 text-gray-700 text-sm">{election.description}</p>
         )}
 
-        {/* Candidates */}
         {loading ? (
           <p className="text-gray-600 mt-4">Loading candidates...</p>
-        ) : displayedCandidates.length > 0 ? (
+        ) : candidates.length > 0 ? (
           <div className="mt-4 grid grid-cols-3 gap-6">
-            {displayedCandidates.slice(0, 3).map((c, idx) => (
+            {candidates.slice(0, 3).map((c, idx) => (
               <div key={c.id || idx} className="flex flex-col items-center text-center">
                 <img
                   src={c.image}
@@ -148,9 +142,9 @@ const ElectionCard = ({ election, token: propToken }) => {
                 {isActive && <VoteButton candidate={c} onVote={handleVote} />}
               </div>
             ))}
-            {displayedCandidates.length > 3 && (
+            {candidates.length > 3 && (
               <div className="flex items-center justify-center text-sm font-semibold text-gray-700">
-                +{displayedCandidates.length - 3} more
+                +{candidates.length - 3} more
               </div>
             )}
           </div>
