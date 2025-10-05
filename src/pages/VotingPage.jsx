@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import CandidateCard from "../components/CandidateCard";
 import VoterForm from "../components/VoterForm";
 
-const API_BASE = "https://voting-app-backend-kz3fibs57-akinsulure-seyis-projects.vercel.app"; // your backend URL
+const API_BASE = "https://new-backend-voting-app.vercel.app"; // your backend URL
 
 const VotingPage = ({ token }) => {
   const [verified, setVerified] = useState(false);

@@ -11,7 +11,7 @@ const LoginPage = ({ onLogin }) => {
     setError("");
 
     try {
-      const res = await axios.post("https://voting-app-backend-kz3fibs57-akinsulure-seyis-projects.vercel.app", {
+      const res = await axios.post("https://new-backend-voting-app.vercel.app", {
         email,
         password,
       });

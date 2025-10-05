@@ -10,7 +10,7 @@ import {
   Legend,
 } from "recharts";
 
-const API_BASE = "http://https://voting-app-backend-kz3fibs57-akinsulure-seyis-projects.vercel.app";
+const API_BASE = "http://new-backend-voting-app.vercel.app";
 
 const ResultsPage = ({ token, userRole }) => {
   const [candidates, setCandidates] = useState([]);

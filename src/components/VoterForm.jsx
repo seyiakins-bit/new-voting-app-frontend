@@ -1,7 +1,7 @@
 // src/components/VoterForm.jsx
 import React, { useState } from "react";
 
-const API_BASE = "https://voting-app-backend-kz3fibs57-akinsulure-seyis-projects.vercel.app"; // your backend URL
+const API_BASE = "https://new-backend-voting-app.vercel.app"; // your backend URL
 
 const VoterForm = ({ onVerified }) => {
   const [formData, setFormData] = useState({

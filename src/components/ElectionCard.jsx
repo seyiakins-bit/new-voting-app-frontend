@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // <-- IMPORTANT
 import VoteButton from "./VoteButton";
 
-const API_BASE = "https://voting-app-backend-kz3fibs57-akinsulure-seyis-projects.vercel.app"; // backend URL
+const API_BASE = "https://new-backend-voting-app.vercel.app"; // backend URL
 
 const ElectionCard = ({ election, token: propToken }) => {
   const isActive = election.status === "active";

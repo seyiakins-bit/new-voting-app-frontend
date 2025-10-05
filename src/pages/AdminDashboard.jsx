@@ -18,10 +18,10 @@ const AdminDashboard = () => {
 
     try {
       const [candidateRes, votersRes] = await Promise.all([
-        axios.get("https://voting-app-backend-kz3fibs57-akinsulure-seyis-projects.vercel.app", {
+        axios.get("https://new-backend-voting-app.vercel.app", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get("https://voting-app-backend-kz3fibs57-akinsulure-seyis-projects.vercel.app", {
+        axios.get("https://new-backend-voting-app.vercel.app", {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);

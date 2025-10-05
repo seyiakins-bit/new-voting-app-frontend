@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = "https://voting-app-backend-kz3fibs57-akinsulure-seyis-projects.vercel.app";
+const API_BASE = "https://new-backend-voting-app.vercel.app";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
